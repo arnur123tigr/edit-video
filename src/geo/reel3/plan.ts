@@ -53,25 +53,25 @@ export const P = {
 };
 
 /** Сомалийский блок: всё восточнее рифта (с запасом в океан). */
-export const SOMALI_BLOCK: Line = [...(data.rift as unknown as Line), [36.0, -19.0], [62.0, -19.0], [62.0, 12.1], [44.0, 12.1]];
+export const SOMALI_BLOCK: Line = [...(data.rift as unknown as Line), [37.2, -17.9], [40.0, -50.0], [80.0, -50.0], [80.0, 12.1], [44.0, 12.1]];
 /** Нубийская сторона: западнее рифта. */
-export const NUBIA_BLOCK: Line = [...(data.rift as unknown as Line), [35.3, -19.0], [5.0, -19.0], [5.0, 16.0], [43.0, 16.0]];
+export const NUBIA_BLOCK: Line = [...(data.rift as unknown as Line), [37.2, -17.9], [40.0, -50.0], [-30.0, -50.0], [-30.0, 40.0], [43.0, 40.0]];
 
 /* ───────── Камера ───────── */
 
 export const CAM = {
   space: { lon: 24, lat: 4, zoom: 1.3 },
-  africa: { lon: 20, lat: 2, zoom: 2.45 },
+  africa: { lon: 20, lat: 5, zoom: 2.55 },
   east: { lon: 37.2, lat: -2.6, zoom: 4.12 },
   compare: { lon: 31, lat: 2, zoom: 2.62 },
   plates: { lon: 37.3, lat: 1.5, zoom: 4.3 },
   section: { lon: 36.4, lat: -0.9, zoom: 6.4 },
   kenya: { lon: 36.415, lat: -1.035, zoom: 12.7 },
-  afar: { lon: 40.58, lat: 12.33, zoom: 10.95 },
+  afar: { lon: 40.59, lat: 12.36, zoom: 10.85 },
   slow: { lon: 37.6, lat: 0.5, zoom: 4.05 },
   future: { lon: 41.5, lat: 2.5, zoom: 3.75 },
   redSea: { lon: 38.8, lat: 19.6, zoom: 4.35 },
-  world: { lon: 25, lat: 12, zoom: 1.55 },
+  world: { lon: 22, lat: 16, zoom: 1.72 },
   end: { lon: 24, lat: 2, zoom: 2.3 },
 };
 

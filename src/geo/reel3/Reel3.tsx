@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { DARK, MapView, PatchLayer, TileLayer, useMap } from "../engine/MapView";
 import { COL, Circle, Counter, Dim, GeoArea, GeoPath, Label, Pulse, life, popIn } from "../engine/overlays";
 import { FPS, H, LngLat, Line, W, along, clamp01, easeInOut, easeOut, lerp, prog } from "../engine/geo";
-import { ADEN, AFRICA, KZ_HERE, NUBIA_BLOCK, P, PLATES, RED_SEA, RIFT, ROAD, S, SOMALI_BLOCK, camAt } from "./plan";
+import { AFRICA, KZ_HERE, NUBIA_BLOCK, P, PLATES, RED_SEA, RIFT, ROAD, S, SOMALI_BLOCK, camAt } from "./plan";
 
 const HOT = COL.hot;
 const NUBIA = "#e3b26b";
@@ -88,7 +88,7 @@ const Length: React.FC<{ t: number }> = ({ t }) => {
         <line x1={x0} y1={ay} x2={ex} y2={ey} stroke="#fff" strokeWidth={4} strokeDasharray="14 10" />
         {p >= 1 ? tick(x1, by) : null}
       </svg>
-      <Label at={[(x0 + x1) / 2 + 40, (ay + by) / 2]} screen text="3 000+ км" t={t} t0={S[1] + 2.8} t1={S[2] + 0.3} size={86} align="left" />
+      <Label at={[W / 2, 440]} screen text="3 000+ км" t={t} t0={S[1] + 2.8} t1={S[2] + 0.3} size={100} upper={false} />
     </>
   );
 };
@@ -218,12 +218,11 @@ const Afar: React.FC<{ t: number }> = ({ t }) => {
   if (v <= 0) return null;
   const p = easeInOut(prog(t, S[6] + 3.1, S[6] + 4.5));
   const flash = t > S[6] + 3.1 ? 0.7 + 0.3 * Math.abs(Math.sin((t - S[6] - 3.1) * 5)) : 0;
-  const mid = project(P.afarFault[3]);
   return (
     <>
       <GeoPath line={P.afarFault} to={p} color={HOT} width={9} glow={10} opacity={v * flash} />
       <Volcano at={project(P.dabbahu)} t={t} t0={S[6] + 2.5} t1={S[7] + 0.5} />
-      <Label at={[mid[0] + 90, mid[1]]} screen text="60 км · 2005" t={t} t0={S[6] + 4.2} t1={S[7] + 0.5} size={78} align="left" upper={false} />
+      <Label at={[W / 2, 440]} screen text="60 км · 2005" t={t} t0={S[6] + 4.2} t1={S[7] + 0.5} size={92} upper={false} />
     </>
   );
 };
@@ -277,6 +276,7 @@ const FutureOcean: React.FC<{ t: number }> = ({ t }) => {
   const m = easeInOut(prog(t, S[8] + 0.6, S[8] + 4.6));
   const water = easeInOut(prog(t, S[8] + 1.6, S[8] + 5.6));
   const d = toD(project, SOMALI_BLOCK);
+  const rift = "M" + RIFT.pts.map((p) => project(p).map((n) => n.toFixed(1)).join(",")).join("L");
   const [px, py] = project([36.5, -17.5]);
   const [, ny] = project([43, 13]);
   const [, sy] = project([35, -18]);
@@ -284,12 +284,21 @@ const FutureOcean: React.FC<{ t: number }> = ({ t }) => {
   const mask = `linear-gradient(to bottom, black 0px, black ${front - 60}px, transparent ${front + 60}px)`;
   return (
     <div style={{ position: "absolute", inset: 0, opacity: on }}>
-      {/* дно разлома и вода в нём (видно только в щели) */}
+      {/* дно разлома и вода в нём: полоса вдоль рифта с восточной стороны (видна только в щели) */}
       <svg width={W} height={H} style={{ position: "absolute", inset: 0 }}>
-        <path d={d} fill="#1d150e" />
+        <defs>
+          <clipPath id="somClip">
+            <path d={d} />
+          </clipPath>
+        </defs>
+        <g clipPath="url(#somClip)">
+          <path d={rift} fill="none" stroke="#1d150e" strokeWidth={260} strokeLinejoin="round" strokeLinecap="round" />
+        </g>
       </svg>
       <svg width={W} height={H} style={{ position: "absolute", inset: 0, maskImage: mask, WebkitMaskImage: mask }}>
-        <path d={d} fill="#0f4f8f" />
+        <g clipPath="url(#somClip)">
+          <path d={rift} fill="none" stroke="#0f4f8f" strokeWidth={260} strokeLinejoin="round" strokeLinecap="round" />
+        </g>
       </svg>
       {/* сам блок — копия карты, сдвинутая на восток с лёгким поворотом */}
       <div
@@ -297,7 +306,7 @@ const FutureOcean: React.FC<{ t: number }> = ({ t }) => {
           position: "absolute",
           inset: 0,
           clipPath: `path('${d}')`,
-          transform: `translate(${62 * m}px, ${6 * m}px) rotate(${-3.2 * m}deg)`,
+          transform: `translate(${58 * m}px, ${4 * m}px) rotate(${2.2 * m}deg)`,
           transformOrigin: `${px}px ${py}px`,
         }}
       >
@@ -305,7 +314,7 @@ const FutureOcean: React.FC<{ t: number }> = ({ t }) => {
           <TileLayer cam={cam} />
         </div>
       </div>
-      <GeoArea rings={[...RED_SEA, ...ADEN]} fill={COL.water} opacity={0.35 * life(t, S[8] + 1.2, S[9] + 1.0, 0.5, 0.5)} />
+      <GeoArea rings={RED_SEA} fill={COL.water} opacity={0.35 * life(t, S[8] + 1.2, S[9] + 1.0, 0.5, 0.5)} />
     </div>
   );
 };
@@ -315,7 +324,7 @@ const RedSea: React.FC<{ t: number }> = ({ t }) => (
   <>
     <GeoArea rings={RED_SEA} fill={COL.water} stroke={COL.waterLight} strokeWidth={3} opacity={0.45 * life(t, S[9] + 1.0, S[10] + 0.4, 0.5, 0.4)} />
     <Circle at={P.redSea} t={t} t0={S[9] + 1.4} t1={S[10] + 0.4} r={380} rx={130} rot={-30} width={7} dur={0.8} />
-    <Label at={P.redSea} text="Қызыл теңіз" t={t} t0={S[9] + 1.9} t1={S[10] + 0.4} size={84} dx={150} dy={60} align="left" />
+    <Label at={[W / 2, 440]} screen text="Қызыл теңіз" t={t} t0={S[9] + 1.9} t1={S[10] + 0.4} size={92} />
   </>
 );
 
@@ -328,6 +337,7 @@ const World: React.FC<{ t: number }> = ({ t }) => {
       {PLATES.map((l, i) => (
         <GeoPath key={i} line={l} color="rgba(255,255,255,0.75)" width={2.4} opacity={v} />
       ))}
+      <Label at={along(RIFT, 0.45)} text="рифт" t={t} t0={S[10] + 5.7} t1={S[11] + 0.5} size={72} dx={60} align="left" color={HOT} />
     </>
   );
 };
@@ -343,8 +353,7 @@ const Hud: React.FC<{ t: number }> = ({ t }) => (
     <NailNote t={t} />
     <Label at={[W / 2, 440]} screen text="жаңа мұхит" t={t} t0={S[8] + 3.2} t1={S[9] + 0.6} size={92} upper={false} />
     <Label at={[W / 2, 330]} screen text="ҰБТ" t={t} t0={S[10] + 0.3} t1={S[11] + 0.4} size={150} />
-    <Label at={[W / 2, 1520]} screen text="дивергентті шекара" t={t} t0={S[10] + 4.9} t1={S[11] + 0.5} size={80} upper={false} />
-    <Label at={[W / 2, 1620]} screen text="рифт" t={t} t0={S[10] + 5.7} t1={S[11] + 0.5} size={96} color={HOT} />
+    <Label at={[W / 2, 1310]} screen text="дивергентті шекара" t={t} t0={S[10] + 4.9} t1={S[11] + 0.5} size={80} upper={false} />
   </>
 );
 

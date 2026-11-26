@@ -91,5 +91,21 @@
   ],
   "scene": "S2A_37PFP_20221119_0_L2A",
   "cloud": 0.0
+ },
+ "deadsea": {
+  "src": "geo/s2/deadsea.jpg",
+  "bounds": [
+   35.301141,
+   30.955869,
+   35.658859,
+   31.782314
+  ],
+  "size": [
+   961,
+   2600
+  ],
+  "scene": "S2B_36RYV_20230823_0_L2A",
+  "cloud": 0.13,
+  "water": "geo/s2/deadsea_water.png"
  }
 }

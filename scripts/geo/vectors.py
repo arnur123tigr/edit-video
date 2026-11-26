@@ -209,3 +209,29 @@ def export_reel3(plates_path="/tmp/claude-0/plates/PB2002_boundaries.json"):
 
 if __name__ == "__main__" and len(sys.argv) > 2 and sys.argv[2] == "reel3":
     export_reel3()
+
+
+def lakes_named(name):
+    gs = [shape(f["geometry"]) for f in load("ne_10m_lakes") if f["properties"].get("name") == name]
+    return unary_union(gs)
+
+
+def export_reel4():
+    baltic = unary_union([marine(n) for n in ("Baltic Sea", "Gulf of Bothnia", "Gulf of Finland", "Gulf of Riga")])
+    desert_names = {"Egypt", "Sudan", "Eritrea", "Saudi Arabia", "Yemen", "Jordan", "Djibouti"}
+    deserts = unary_union([shape(f["geometry"]) for f in load("ne_10m_admin_0_countries") if f["properties"]["ADMIN"] in desert_names])
+    data = {
+        "deadSea": poly_coords(lakes_named("Dead Sea"), 0.002, 0.0),
+        "baltic": poly_coords(baltic, 0.02, 0.05),
+        "redSea": poly_coords(marine("Red Sea"), 0.02),
+        "caspian": poly_coords(marine("Caspian Sea"), 0.02),
+        "northAral": poly_coords(lakes_named("North Aral Sea"), 0.004, 0.0),
+        "southAral": poly_coords(lakes_named("South Aral Sea"), 0.004, 0.0),
+        "deserts": poly_coords(deserts, 0.03, 0.2),
+        "med": poly_coords(marine("Mediterranean Sea"), 0.03, 0.2),
+    }
+    save("reel4", data)
+
+
+if __name__ == "__main__" and len(sys.argv) > 2 and sys.argv[2] == "reel4":
+    export_reel4()
