@@ -109,14 +109,15 @@ const rectOf = (project: (p: LngLat) => [number, number], b: [number, number, nu
   return { left: x0, top: y0, width: x1 - x0, height: y1 - y0 };
 };
 
-const FEATHER =
-  "linear-gradient(to right, transparent 0%, black 9%, black 91%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 9%, black 91%, transparent 100%)";
+const featherMask = (f = 9) =>
+  `linear-gradient(to right, transparent 0%, black ${f}%, black ${100 - f}%, transparent 100%), linear-gradient(to bottom, transparent 0%, black ${f}%, black ${100 - f}%, transparent 100%)`;
 
 /** Снимок появляется плавно, когда камера приближается (zoomIn..zoomFull). */
-export const PatchLayer: React.FC<{ name: string; zoomIn?: number; zoomFull?: number }> = ({
+export const PatchLayer: React.FC<{ name: string; zoomIn?: number; zoomFull?: number; feather?: number }> = ({
   name,
   zoomIn = 8,
   zoomFull = 9.2,
+  feather = 9,
 }) => {
   const { cam, project } = useMap();
   const p = PATCHES[name];
@@ -131,9 +132,9 @@ export const PatchLayer: React.FC<{ name: string; zoomIn?: number; zoomFull?: nu
         position: "absolute",
         ...r,
         opacity: op,
-        maskImage: FEATHER,
+        maskImage: featherMask(feather),
         maskComposite: "intersect",
-        WebkitMaskImage: FEATHER,
+        WebkitMaskImage: featherMask(feather),
         WebkitMaskComposite: "source-in",
       }}
     />

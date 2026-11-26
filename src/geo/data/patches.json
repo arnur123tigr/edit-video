@@ -95,17 +95,61 @@
  "deadsea": {
   "src": "geo/s2/deadsea.jpg",
   "bounds": [
-   35.301141,
-   30.955869,
-   35.658859,
-   31.782314
+   34.85,
+   30.5,
+   36.15,
+   32.35
   ],
   "size": [
-   961,
+   1799,
+   3000
+  ],
+  "scene": "mosaic:36QXA,36QXU,36QXV,36QYA,36QYU,36QYV,36RXA,36RXU,36RXV,36RYA,36RYU,36RYV,36SXA,36SXU,36SXV,36SYA,36SYU,36SYV,36TXA,36TYA,37QBP,37QBQ,37QBR,37RBP,37RBQ,37RBR,37SBP,37SBQ,37SBR,37TBR",
+  "cloud": 0
+ },
+ "andes": {
+  "src": "geo/s2/andes_tex.jpg",
+  "bounds": [
+   -73.5,
+   -27.0,
+   -61.0,
+   -14.0
+  ],
+  "size": [
+   2275,
+   2534
+  ],
+  "scene": "bluemarble z8",
+  "cloud": 0
+ },
+ "aral": {
+  "src": "geo/s2/aral.jpg",
+  "bounds": [
+   57.6,
+   43.3,
+   62.2,
+   47.2
+  ],
+  "size": [
+   2490,
+   3000
+  ],
+  "scene": "mosaic:40TEN,40TEP,40TEQ,40TER,40TES,40TET,40TFN,40TFP,40TFQ,40TFR,40TFS,40TFT,40TGN,40TGP,40TGQ,40TGR,40TGS,40TGT,41TKH,41TKJ,41TKK,41TKL,41TKM,41TKN,41TLH,41TLJ,41TLK,41TLL,41TLM,41TLN,41TMH,41TMJ,41TMK,41TML,41TMM,41TMN",
+  "cloud": 0
+ },
+ "arica": {
+  "src": "geo/s2/arica.jpg",
+  "bounds": [
+   -70.5,
+   -18.78,
+   -70.1,
+   -18.16
+  ],
+  "size": [
+   1591,
    2600
   ],
-  "scene": "S2B_36RYV_20230823_0_L2A",
-  "cloud": 0.13,
-  "water": "geo/s2/deadsea_water.png"
+  "scene": "mosaic:19JCV,19KCV,19LCV",
+  "cloud": 0
  }
 }

@@ -4,7 +4,7 @@
  */
 import data from "../data/reel3.json";
 import data1 from "../data/reel1.json";
-import { CamPath, LngLat, Line, easeInOut, easeInOutSine, measure, timings } from "../engine/geo";
+import { CamPath, LngLat, Line, easeInOut, easeInOutSine, measure, relocate, timings } from "../engine/geo";
 
 /* ───────── Тайминг: длительность каждого кадра сценария (сек) ───────── */
 export const DURS = [3.5, 6.8, 5.1, 4.3, 6.6, 4.3, 7.4, 7.0, 7.0, 4.5, 7.6, 3.1];
@@ -22,19 +22,7 @@ export const ROAD = measure(data.road as unknown as Line);
 /** Восточно-Африканский рифт (≈3 500 км по линии). */
 export const RIFT = measure(data.rift as unknown as Line);
 
-/**
- * Перенос контура в другое место без искажения масштаба:
- * километры от центра остаются километрами (на Меркаторе север растягивается, поэтому так честнее).
- */
-export const relocate = (rings: Line[], from: LngLat, to: LngLat): Line[] =>
-  rings.map((ring) =>
-    ring.map(([lon, lat]) => {
-      const dx = (lon - from[0]) * 111.32 * Math.cos((lat * Math.PI) / 180);
-      const dy = (lat - from[1]) * 110.57;
-      const nlat = to[1] + dy / 110.57;
-      return [to[0] + dx / (111.32 * Math.cos((nlat * Math.PI) / 180)), nlat] as LngLat;
-    }),
-  );
+export { relocate };
 export const KZ_HERE = relocate(data1.kz as unknown as Line[], [67.0, 48.0], [64.0, -1.0]);
 
 export const P = {

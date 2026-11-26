@@ -303,3 +303,17 @@ export const inRing = (p: LngLat, ring: Line) => {
 
 /** Склеить несколько кусков линий в одну. */
 export const joinLines = (...parts: Line[]): Line => parts.flat();
+
+/**
+ * Перенос контура в другое место без искажения масштаба:
+ * километры от центра остаются километрами (на Меркаторе север растягивается, поэтому так честнее).
+ */
+export const relocate = (rings: Line[], from: LngLat, to: LngLat): Line[] =>
+  rings.map((ring) =>
+    ring.map(([lon, lat]) => {
+      const dx = (lon - from[0]) * 111.32 * Math.cos((lat * Math.PI) / 180);
+      const dy = (lat - from[1]) * 110.57;
+      const nlat = to[1] + dy / 110.57;
+      return [to[0] + dx / (111.32 * Math.cos((nlat * Math.PI) / 180)), nlat] as LngLat;
+    }),
+  );

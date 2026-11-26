@@ -108,6 +108,7 @@ def main():
     ap.add_argument("--px", type=int, default=1400)
     ap.add_argument("--z", type=int, default=7)
     ap.add_argument("--n", type=int, default=500)
+    ap.add_argument("--terrarium", action="store_true", help="heightmap: высоты из Terrarium уровня --z")
     ap.add_argument("--color", default="20,70,190")
     ap.add_argument("--ne", default="/tmp/claude-0/ne")
     a = ap.parse_args()
@@ -193,7 +194,16 @@ def main():
         b = tuple(P["bounds"])
         x0, y0 = merc(b[0], b[1]); x1, y1 = merc(b[2], b[3])
         w = a.px; h = round(a.px * (y1 - y0) / (x1 - x0))
-        z = np.nan_to_num(copdem(b, w, h), nan=0)
+        if a.terrarium:
+            # большие области (сотни км): Terrarium вместо 30-метрового DEM
+            zt, eb = terrarium(b, a.z)
+            th, tw = zt.shape
+            ex0, ey0 = merc(eb[0], eb[1]); ex1, ey1 = merc(eb[2], eb[3])
+            box = ((x0 - ex0) / (ex1 - ex0) * tw, (ey1 - y1) / (ey1 - ey0) * th, (x1 - ex0) / (ex1 - ex0) * tw, (ey1 - y0) / (ey1 - ey0) * th)
+            z = np.array(Image.fromarray(zt, "F").resize((w, h), Image.BILINEAR, box=box))
+            z = np.maximum(z, 0)  # море — ровный ноль
+        else:
+            z = np.nan_to_num(copdem(b, w, h), nan=0)
         lo, hi = float(z.min()), float(z.max())
         q = ((z - lo) / max(hi - lo, 1) * 65535).astype(np.uint16)
         os.makedirs(os.path.join(ROOT, "public/geo/dem"), exist_ok=True)

@@ -304,27 +304,33 @@ export const Label: React.FC<{
   );
 };
 
-/** «→», «≈» и «⟷» рисуем сами: в шрифте Oswald этих знаков нет. */
-const SYMBOLS: Record<string, { w: number; d: string }> = {
+/** «→», «≈», «⟷» и «‰» рисуем сами: в шрифте Oswald этих знаков нет. */
+type Sym = { w: number; d: string; vh?: number; h?: number; sw?: number; lift?: number };
+const ring = (cx: number, cy: number, rx: number, ry: number) => `M${cx - rx},${cy} a${rx},${ry} 0 1,0 ${2 * rx},0 a${rx},${ry} 0 1,0 ${-2 * rx},0`;
+const SYMBOLS: Record<string, Sym> = {
   "→": { w: 62, d: "M2 25 H54 M36 7 L56 25 L36 43" },
   "⟷": { w: 96, d: "M8 25 H88 M26 7 L6 25 L26 43 M70 7 L90 25 L70 43" },
   "≈": { w: 54, d: "M4 18 C14 8 22 8 27 14 C32 20 40 20 50 10 M4 38 C14 28 22 28 27 34 C32 40 40 40 50 30" },
+  // промилле: высота как у цифр, толщина как у жирного Oswald
+  "‰": { w: 108, vh: 100, h: 0.72, sw: 13, lift: 0.07, d: `M60 4 L32 96 ${ring(16, 24, 11, 18)} ${ring(60, 76, 11, 18)} ${ring(92, 76, 11, 18)}` },
 };
 const withArrows = (text: string, size: number) => {
-  const parts = text.split(/([→⟷≈])/);
+  const parts = text.split(/([→⟷≈‰])/);
   if (parts.length === 1) return text;
   return parts.map((p, i) => {
     const sym = SYMBOLS[p];
     if (!sym) return p.trim() ? <span key={i}>{p.trim()}</span> : null;
+    const vh = sym.vh ?? 50;
+    const hh = size * (sym.h ?? 0.5);
     return (
       <svg
         key={i}
-        width={(size * sym.w) / 100}
-        height={size * 0.5}
-        viewBox={`0 0 ${sym.w} 50`}
-        style={{ margin: `0 ${size * 0.14}px`, verticalAlign: "middle", overflow: "visible", position: "relative", top: -size * 0.04 }}
+        width={(hh * sym.w) / vh}
+        height={hh}
+        viewBox={`0 0 ${sym.w} ${vh}`}
+        style={{ margin: `0 ${size * 0.14}px`, verticalAlign: "middle", overflow: "visible", position: "relative", top: -size * (sym.lift ?? 0.04) }}
       >
-        <path d={sym.d} fill="none" stroke="currentColor" strokeWidth={7} strokeLinecap="round" strokeLinejoin="round" />
+        <path d={sym.d} fill="none" stroke="currentColor" strokeWidth={sym.sw ?? 7} strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     );
   });

@@ -2499,5 +2499,59 @@
    1530,
    1523
   ]
+ },
+ "andes_ground": {
+  "src": "geo/dem/andes_ground.jpg",
+  "bounds": [
+   -88.0,
+   -42.0,
+   -46.0,
+   0.0
+  ],
+  "size": [
+   1911,
+   2110
+  ]
+ },
+ "andes_h": {
+  "src": "geo/dem/andes_h.png",
+  "bounds": [
+   -73.5,
+   -27.0,
+   -61.0,
+   -14.0
+  ],
+  "min": 0.0,
+  "max": 6395.09521484375,
+  "size": [
+   1200,
+   1336
+  ]
+ },
+ "aral_south": {
+  "src": "geo/dem/aral_south.png",
+  "bounds": [
+   57.6,
+   43.3,
+   62.2,
+   47.2
+  ],
+  "size": [
+   2490,
+   3000
+  ]
+ },
+ "aral_north": {
+  "src": "geo/dem/aral_north.png",
+  "bounds": [
+   57.6,
+   43.3,
+   62.2,
+   47.2
+  ],
+  "size": [
+   2490,
+   3000
+  ]
  }
 }

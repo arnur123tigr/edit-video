@@ -235,3 +235,37 @@ def export_reel4():
 
 if __name__ == "__main__" and len(sys.argv) > 2 and sys.argv[2] == "reel4":
     export_reel4()
+
+
+def export_reel5():
+    """Атакама (полоса Чили между океаном и предгорьями Анд), Павлодарская область, океан у Арики."""
+    from shapely.geometry import Polygon, box
+    chile = next(shape(f["geometry"]) for f in load("ne_10m_admin_0_countries") if f["properties"]["ADMIN"] == "Chile")
+    peru = next(shape(f["geometry"]) for f in load("ne_10m_admin_0_countries") if f["properties"]["ADMIN"] == "Peru")
+    # восточный край пустыни — предгорья Анд (с севера на юг), включая Салар-де-Атакама
+    east = [(-70.3, -17.6), (-69.5, -18.4), (-69.3, -20.0), (-69.25, -21.5), (-69.4, -23.0), (-69.6, -24.5),
+            (-69.85, -26.0), (-70.2, -27.3), (-70.6, -28.6)]
+    west = Polygon(east + [(-80, -28.6), (-80, -17.6)])
+    atacama = (chile.union(peru)).intersection(west).intersection(box(-80, -28.6, -60, -17.6))
+    atacama = max(atacama.geoms, key=lambda g: g.area) if atacama.geom_type == "MultiPolygon" else atacama
+    pav = next(shape(f["geometry"]) for f in load("ne_10m_admin_1_states_provinces")
+               if f["properties"].get("admin") == "Kazakhstan" and f["properties"].get("name") == "Pavlodar")
+    ocean = unary_union([shape(f["geometry"]) for f in load("ne_10m_ocean")]).intersection(box(-74, -21, -69.5, -16))
+
+    def km2(g):
+        lat0 = g.centroid.y
+        k = 111.32 * 110.57 * math.cos(math.radians(lat0))
+        return round(g.area * k)
+    print("площадь Атакамы, км²", km2(atacama), "Павлодарской обл., км²", km2(pav))
+    data = {
+        "atacama": poly_coords(atacama, 0.01, 0.0),
+        "pavlodar": poly_coords(pav, 0.01, 0.0),
+        "pavlodarCenter": r(list(pav.centroid.coords)[0], 3),
+        "atacamaCenter": r(list(atacama.centroid.coords)[0], 3),
+        "oceanArica": poly_coords(ocean, 0.005, 0.0),
+    }
+    save("reel5", data)
+
+
+if __name__ == "__main__" and len(sys.argv) > 2 and sys.argv[2] == "reel5":
+    export_reel5()
