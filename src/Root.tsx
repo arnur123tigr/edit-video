@@ -7,6 +7,7 @@ import { FontTest } from "./reel02/FontTest";
 import { Reel02Sketch } from "./reel02/Reel02Sketch";
 import { SketchBold, SketchColors, SketchThin } from "./reel02/SketchOptions";
 import { PodcastFonts } from "./reel02/PodcastFonts";
+import { GeoCompositions } from "./geo/GeoRoot";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -33,6 +34,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition id="SketchColors" component={SketchColors} durationInFrames={1} fps={30} width={2192} height={2584} />
       <Composition id="SketchBold" component={SketchBold} durationInFrames={1} fps={30} width={2192} height={2584} />
       <Composition id="SketchThin" component={SketchThin} durationInFrames={1} fps={30} width={2192} height={2584} />
+      <GeoCompositions />
       <Composition id="PodcastFonts" component={PodcastFonts} durationInFrames={1} fps={30} width={2192} height={2584} />
     </>
   );

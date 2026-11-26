@@ -1,0 +1,111 @@
+{
+ "astana": {
+  "src": "geo/s2/astana.jpg",
+  "bounds": [
+   71.206548,
+   50.879718,
+   71.693452,
+   51.418708
+  ],
+  "size": [
+   1360,
+   2400
+  ],
+  "scene": "S2A_42UXB_20220628_0_L2A",
+  "cloud": 0.0,
+  "water": "geo/s2/astana_water.png",
+  "river": "geo/s2/astana_river.png"
+ },
+ "karagiye": {
+  "src": "geo/s2/karagiye.jpg",
+  "bounds": [
+   51.251187,
+   43.042015,
+   52.068813,
+   43.994228
+  ],
+  "size": [
+   1619,
+   2600
+  ],
+  "scene": "S2B_39TWJ_20230927_0_L2A",
+  "cloud": 0.01
+ },
+ "atyrau": {
+  "src": "geo/s2/atyrau.jpg",
+  "bounds": [
+   51.728445,
+   46.892987,
+   52.071555,
+   47.306212
+  ],
+  "size": [
+   1357,
+   2400
+  ],
+  "scene": "S2B_39TWN_20220604_0_L2A",
+  "cloud": 0.01,
+  "water": "geo/s2/atyrau_water.png"
+ },
+ "khantengri": {
+  "src": "geo/s2/khantengri.jpg",
+  "bounds": [
+   79.903181,
+   41.867718,
+   80.436819,
+   42.550437
+  ],
+  "size": [
+   1389,
+   2400
+  ],
+  "scene": "S2B_44TMM_20220926_0_L2A",
+  "cloud": 1.9
+ },
+ "maimahiu": {
+  "src": "geo/s2/maimahiu.jpg",
+  "bounds": [
+   36.366092,
+   -1.125669,
+   36.473908,
+   -0.934328
+  ],
+  "size": [
+   1352,
+   2400
+  ],
+  "scene": "S2B_37MBU_20240914_0_L2A",
+  "cloud": 0.21
+ },
+ "afar": {
+  "src": "geo/s2/afar.jpg",
+  "bounds": [
+   40.376095,
+   12.010906,
+   40.743905,
+   12.648706
+  ],
+  "size": [
+   1352,
+   2400
+  ],
+  "scene": "S2A_37PFP_20221119_0_L2A",
+  "cloud": 0.0
+ },
+ "deadsea": {
+  "src": "geo/s2/deadsea.jpg",
+  "bounds": [
+   35.301141,
+   30.955869,
+   35.658859,
+   31.782314
+  ],
+  "size": [
+   961,
+   2600
+  ],
+  "scene": "S2B_36RYV_20230823_0_L2A",
+  "cloud": 0.13,
+  "water": "geo/s2/deadsea_water.png"
+ }
+}
