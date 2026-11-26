@@ -2,6 +2,7 @@ import React, { createContext, useContext } from "react";
 import { AbsoluteFill, Img, staticFile } from "remotion";
 import tilesManifest from "../data/tiles.json";
 import patchesJson from "../data/patches.json";
+import overlaysJson from "../data/overlays.json";
 import {
   Cam,
   H,
@@ -49,7 +50,7 @@ const resolveTile = (l: number, xi: number, y: number): Placed | null => {
   return null;
 };
 
-const TileLayer: React.FC<{ cam: Cam }> = ({ cam }) => {
+export const TileLayer: React.FC<{ cam: Cam }> = ({ cam }) => {
   const [cx, cy] = toWorld(cam.lon, cam.lat);
   const S = worldScale(cam.zoom);
   // индекс x не сворачиваем: так тайлы склеиваются через 180°
@@ -135,6 +136,41 @@ export const PatchLayer: React.FC<{ name: string; zoomIn?: number; zoomFull?: nu
         WebkitMaskImage: FEATHER,
         WebkitMaskComposite: "source-in",
       }}
+    />
+  );
+};
+
+/* ───────── Готовые растровые слои (рельеф, низменности) ───────── */
+
+export type Overlay = { src: string; bounds: [number, number, number, number]; min?: number; max?: number; size?: [number, number] };
+export const OVERLAYS = overlaysJson as unknown as Record<string, Overlay>;
+
+/**
+ * Картинка, привязанная к координатам (bounds в Меркаторе).
+ * reveal — круг, который растёт из точки (0..1), как «разлив» воды.
+ */
+export const GeoImage: React.FC<{
+  name: string;
+  opacity: number;
+  reveal?: { at: LngLat; p: number; r: number };
+  blur?: number;
+  style?: React.CSSProperties;
+}> = ({ name, opacity, reveal, blur = 0, style }) => {
+  const { project } = useMap();
+  const o = OVERLAYS[name];
+  if (!o || opacity <= 0) return null;
+  const r = rectOf(project, o.bounds);
+  let mask: React.CSSProperties = {};
+  if (reveal) {
+    const [sx, sy] = project(reveal.at);
+    const rr = Math.max(1, reveal.r * reveal.p);
+    const g = `radial-gradient(circle ${rr.toFixed(0)}px at ${(sx - r.left).toFixed(0)}px ${(sy - r.top).toFixed(0)}px, black 0%, black 82%, transparent 100%)`;
+    mask = { maskImage: g, WebkitMaskImage: g };
+  }
+  return (
+    <Img
+      src={staticFile(o.src)}
+      style={{ position: "absolute", ...r, opacity, filter: blur ? `blur(${blur}px)` : undefined, ...mask, ...style }}
     />
   );
 };

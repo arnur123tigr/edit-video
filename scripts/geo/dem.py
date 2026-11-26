@@ -160,9 +160,16 @@ def main():
         rgba[..., 3] = (low * 255).astype(np.uint8)
         save_overlay(a.name, rgba, eb)
     elif a.cmd == "profile":
-        lo1, la1, lo2, la2 = a.nums
-        pts = [(lo1 + (lo2 - lo1) * i / (a.n - 1), la1 + (la2 - la1) * i / (a.n - 1)) for i in range(a.n)]
-        b = (min(lo1, lo2) - 0.2, min(la1, la2) - 0.2, max(lo1, lo2) + 0.2, max(la1, la2) + 0.2)
+        # ломаная: lon1 lat1 lon2 lat2 [lon3 lat3 ...] — точки распределяются по длине участков
+        way = [(a.nums[i], a.nums[i + 1]) for i in range(0, len(a.nums), 2)]
+        seg = [math.dist(way[i], way[i + 1]) for i in range(len(way) - 1)]
+        pts = []
+        for i, L in enumerate(seg):
+            k = max(2, round(a.n * L / sum(seg)))
+            (lo1, la1), (lo2, la2) = way[i], way[i + 1]
+            pts += [(lo1 + (lo2 - lo1) * j / k, la1 + (la2 - la1) * j / k) for j in range(0 if i == 0 else 1, k + 1)]
+        lons = [p[0] for p in way]; lats = [p[1] for p in way]
+        b = (min(lons) - 0.2, min(lats) - 0.2, max(lons) + 0.2, max(lats) + 0.2)
         z, eb = terrarium(b, a.z)
         h, w = z.shape
         ex0, ey0 = merc(eb[0], eb[1]); ex1, ey1 = merc(eb[2], eb[3])
@@ -178,7 +185,7 @@ def main():
                 dist += 6371 * math.acos(min(1, math.sin(math.radians(la)) * math.sin(math.radians(p0[1])) + math.cos(math.radians(la)) * math.cos(math.radians(p0[1])) * math.cos(math.radians(lo - p0[0]))))
             prof.append([round(dist, 1), round(float(win.max() if win.size else z[py, px]), 1)])
         data = json.load(open(OVR)) if os.path.exists(OVR) else {}
-        data[a.name] = {"profile": prof, "from": [lo1, la1], "to": [lo2, la2]}
+        data[a.name] = {"profile": prof, "path": [list(p) for p in way]}
         json.dump(data, open(OVR, "w"), ensure_ascii=False, indent=1)
         print("разрез", a.name, "мин", min(p[1] for p in prof), "макс", max(p[1] for p in prof), "длина", round(dist))
     elif a.cmd == "heightmap":

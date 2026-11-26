@@ -222,7 +222,9 @@ export const Circle: React.FC<{
   color?: string;
   width?: number;
   dur?: number;
-}> = ({ at, screen, t, t0, t1 = 1e9, r, rx, color = COL.ink, width = 6, dur = 0.6 }) => {
+  /** поворот эллипса, градусы */
+  rot?: number;
+}> = ({ at, screen, t, t0, t1 = 1e9, r, rx, color = COL.ink, width = 6, dur = 0.6, rot = 0 }) => {
   const map = useMapOpt();
   const vis = life(t, t0, t1, 0.05, 0.3);
   if (vis <= 0) return null;
@@ -232,17 +234,22 @@ export const Circle: React.FC<{
   const c = Math.PI * (3 * (a + r) - Math.sqrt((3 * a + r) * (a + 3 * r)));
   return (
     <svg width={W} height={H} style={{ position: "absolute", inset: 0, opacity: vis, overflow: "visible" }}>
-      <ellipse
-        cx={x}
-        cy={y}
-        rx={a}
-        ry={r}
+      <path
+        d={(() => {
+          // эллипс как путь: обводка начинается слева сверху, форма не поворачивается вместе со стартом
+          const a0 = (-110 * Math.PI) / 180;
+          const sx = x + a * Math.cos(a0);
+          const sy = y + r * Math.sin(a0);
+          const ox = x - a * Math.cos(a0);
+          const oy = y - r * Math.sin(a0);
+          return `M${sx},${sy} A${a},${r} 0 1 1 ${ox},${oy} A${a},${r} 0 1 1 ${sx},${sy}`;
+        })()}
         fill="none"
         stroke={color}
         strokeWidth={width}
         strokeLinecap="round"
         strokeDasharray={`${c * p} ${c}`}
-        transform={`rotate(-110 ${x} ${y})`}
+        transform={rot ? `rotate(${rot} ${x} ${y})` : undefined}
         style={{ filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.6))" }}
       />
     </svg>
@@ -297,16 +304,30 @@ export const Label: React.FC<{
   );
 };
 
-/** «→» рисуем сами: в шрифте Oswald этой стрелки нет. */
+/** «→», «≈» и «⟷» рисуем сами: в шрифте Oswald этих знаков нет. */
+const SYMBOLS: Record<string, { w: number; d: string }> = {
+  "→": { w: 62, d: "M2 25 H54 M36 7 L56 25 L36 43" },
+  "⟷": { w: 96, d: "M8 25 H88 M26 7 L6 25 L26 43 M70 7 L90 25 L70 43" },
+  "≈": { w: 54, d: "M4 18 C14 8 22 8 27 14 C32 20 40 20 50 10 M4 38 C14 28 22 28 27 34 C32 40 40 40 50 30" },
+};
 const withArrows = (text: string, size: number) => {
-  const parts = text.split("→");
+  const parts = text.split(/([→⟷≈])/);
   if (parts.length === 1) return text;
-  const arrow = (k: number) => (
-    <svg key={`a${k}`} width={size * 0.62} height={size * 0.5} viewBox="0 0 62 50" style={{ margin: `0 ${size * 0.14}px`, verticalAlign: "middle", overflow: "visible" }}>
-      <path d="M2 25 H54 M36 7 L56 25 L36 43" fill="none" stroke="currentColor" strokeWidth={7} strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-  return parts.flatMap((p, i) => (i === 0 ? [p.trim()] : [arrow(i), p.trim()]));
+  return parts.map((p, i) => {
+    const sym = SYMBOLS[p];
+    if (!sym) return p.trim() ? <span key={i}>{p.trim()}</span> : null;
+    return (
+      <svg
+        key={i}
+        width={(size * sym.w) / 100}
+        height={size * 0.5}
+        viewBox={`0 0 ${sym.w} 50`}
+        style={{ margin: `0 ${size * 0.14}px`, verticalAlign: "middle", overflow: "visible", position: "relative", top: -size * 0.04 }}
+      >
+        <path d={sym.d} fill="none" stroke="currentColor" strokeWidth={7} strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    );
+  });
 };
 
 /** Точка города + название. */

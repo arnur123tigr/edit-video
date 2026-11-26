@@ -169,3 +169,43 @@ def export_reel1():
 
 if __name__ == "__main__" and len(sys.argv) > 2 and sys.argv[2] == "reel1":
     export_reel1()
+
+
+def px_to_lnglat(patch, pts):
+    """Пиксели детального снимка → долгота/широта (снимок в Меркаторе)."""
+    P = json.load(open(os.path.join(OUT, "patches.json")))[patch]
+    w, s, e, n = P["bounds"]; W, H = P["size"]
+    my = lambda lat: math.log(math.tan(math.pi / 4 + math.radians(lat) / 2))
+    y0, y1 = my(n), my(s)
+    out = []
+    for x, y in pts:
+        yy = y0 + (y1 - y0) * y / H
+        out.append(r((w + (e - w) * x / W, math.degrees(2 * math.atan(math.exp(yy)) - math.pi / 2)), 5))
+    return out
+
+
+def export_reel3(plates_path="/tmp/claude-0/plates/PB2002_boundaries.json"):
+    africa = unary_union([shape(f["geometry"]) for f in load("ne_10m_admin_0_countries") if f["properties"].get("CONTINENT") == "Africa"])
+    # Восточно-Африканский рифт: восточная ветвь (Афар → Эфиопия → Кения → Танзания) и Малави
+    rift = [(43.0, 11.75), (42.2, 11.5), (41.2, 11.0), (40.3, 10.0), (39.5, 8.7), (38.6, 7.4), (37.9, 6.0), (37.0, 4.9), (36.4, 3.9),
+            (36.1, 2.6), (36.0, 1.3), (36.1, 0.3), (36.3, -0.6), (36.42, -1.03), (36.2, -2.0), (35.9, -3.0), (35.7, -4.2), (35.4, -5.6),
+            (34.9, -7.2), (34.1, -8.8), (33.9, -9.8), (34.2, -11.0), (34.5, -12.6), (34.8, -14.0), (35.2, -15.6), (35.3, -17.0)]
+    rift = smooth_pts(rift, 1)
+    # дорога Маи-Махиу — Нарок по снимку Sentinel-2 (пиксели снимка)
+    road = px_to_lnglat("maimahiu", [(0, 1222), (150, 1221), (330, 1217), (420, 1220), (500, 1226), (600, 1235), (700, 1242),
+                                      (800, 1234), (900, 1209), (1000, 1197), (1100, 1181), (1200, 1150), (1300, 1110), (1352, 1086)])
+    pl = json.load(open(plates_path))["features"]
+    plates = [simplify([tuple(c) for c in f["geometry"]["coordinates"]], 0.08) for f in pl]
+    data = {
+        "africa": poly_coords(africa, 0.02, 0.3),
+        "rift": [r(p, 3) for p in rift],
+        "road": road,
+        "redSea": poly_coords(marine("Red Sea"), 0.02),
+        "gulfAden": poly_coords(marine("Gulf of Aden"), 0.02),
+        "plates": plates,
+    }
+    save("reel3", data)
+
+
+if __name__ == "__main__" and len(sys.argv) > 2 and sys.argv[2] == "reel3":
+    export_reel3()
